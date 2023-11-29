@@ -16,7 +16,6 @@ contract SocialConnections is Initializable, OwnableUpgradeable, UUPSUpgradeable
         uint8 size;
     }
 
-    // todo use ERC-7201 for storage https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#modifying-your-contracts
     // Mapping for service smart accounts' connections
     mapping(address => Multihash) public serviceConnections;
 
