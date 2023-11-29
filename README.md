@@ -18,9 +18,9 @@ The following contracts are available in the repository:
 
 Network: [Optimism Sepolia](https://sepolia-optimism.etherscan.io/)
 
-SocialConnections.sol: [0xD8FC858221428B6b8ce304CE7aF1E838067Ea806](https://sepolia-optimism.etherscan.io/address/0xD8FC858221428B6b8ce304CE7aF1E838067Ea806)
-FilesystemChanges.sol: [0x204B8968E70084cDCBad327614334F1D7553aaF2](https://sepolia-optimism.etherscan.io/address/0x204B8968E70084cDCBad327614334F1D7553aaF2)
-UserVerification.sol: [0xBA44aaa2809931401ec099D798A5376cd678a12a](https://sepolia-optimism.etherscan.io/address/0xBA44aaa2809931401ec099D798A5376cd678a12a)
+- `SocialConnections.sol`: [0xD8FC858221428B6b8ce304CE7aF1E838067Ea806](https://sepolia-optimism.etherscan.io/address/0xD8FC858221428B6b8ce304CE7aF1E838067Ea806)
+- `FilesystemChanges.sol`: [0x204B8968E70084cDCBad327614334F1D7553aaF2](https://sepolia-optimism.etherscan.io/address/0x204B8968E70084cDCBad327614334F1D7553aaF2)
+- `UserVerification.sol`: [0xBA44aaa2809931401ec099D798A5376cd678a12a](https://sepolia-optimism.etherscan.io/address/0xBA44aaa2809931401ec099D798A5376cd678a12a)
 
 ## Deploy contracts
 
