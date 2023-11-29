@@ -1,0 +1,40 @@
+{
+  "name": "@dappykit/contracts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "truffle test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
+    "@openzeppelin/contracts": "^5.0.0",
+    "@openzeppelin/hardhat-upgrades": "^2.4.1",
+    "@types/chai": "^4.3.5",
+    "@types/expect": "^24.3.0",
+    "@types/mocha": "^10.0.4",
+    "@types/node": "^20.4.5",
+    "hardhat": "^2.19.0",
+    "ts-mocha": "^10.0.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2",
+    "web3": "^1.9.0"
+  },
+  "dependencies": {
+    "@account-abstraction/contracts": "^0.6.0",
+    "@account-abstraction/sdk": "^0.6.0",
+    "@alchemy/aa-alchemy": "^0.1.0-alpha.29",
+    "@alchemy/aa-core": "^0.1.0-alpha.29",
+    "@alchemy/aa-ethers": "^0.1.0-alpha.29",
+    "@openzeppelin/contracts-upgradeable": "^5.0.0",
+    "alchemy-sdk": "^2.10.0",
+    "chai-as-promised": "^7.1.1",
+    "node-fetch": "^3.3.2"
+  }
+}
