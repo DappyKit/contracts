@@ -1,6 +1,8 @@
 import { ethers } from 'hardhat'
 import 'dotenv/config'
 import { AddressLike } from 'ethers'
+import fs from 'fs'
+import path from 'path'
 
 const socialConnectionsOwner = process.env.SOCIAL_CONNECTIONS_OWNER as AddressLike
 const filesystemChangesOwner = process.env.FILESYSTEM_CHANGES_OWNER as AddressLike
@@ -61,6 +63,22 @@ async function main() {
   await userVerification.waitForDeployment()
   await userVerification.initialize(userVerificationOwner, userVerificationTokenName, userVerificationTokenSymbol, userVerificationTokenExpirationTime)
   console.log(`UserVerification deployed to ${userVerification.target}`)
+
+  writeContractsJson({
+    socialConnections: socialConnections.target,
+    filesystemChanges: filesystemChanges.target,
+    userVerification: userVerification.target,
+  })
+}
+
+function writeContractsJson(data: unknown) {
+  const filePath = path.join(process.cwd(), 'deployed-contracts.json')
+  try {
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2))
+    console.log(`File written successfully to ${filePath}`)
+  } catch (error) {
+    console.error('Error writing file:', error)
+  }
 }
 
 main().catch((error) => {
