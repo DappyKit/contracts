@@ -2,7 +2,6 @@ import { loadFixture } from '@nomicfoundation/hardhat-toolbox/network-helpers'
 import { expect } from 'chai'
 import { ethers } from 'hardhat'
 import { getBytes32Hash, ONE_YEAR } from '../utils/data'
-import { Wallet } from 'alchemy-sdk'
 
 const EXPIRED_TOKEN_SECONDS = 100
 
@@ -38,7 +37,7 @@ describe('UserVerification', () => {
 
     it('should not issue a token if one already exists for the user', async () => {
       const { userVerification, owner, tokenId, tokenId2 } = await loadFixture(deployUserVerificationFixture)
-      const wallet2 = Wallet.createRandom()
+      const wallet2 = ethers.Wallet.createRandom()
 
       await userVerification.issueToken(owner.address, tokenId)
       await expect(userVerification.issueToken(owner.address, tokenId2)).to.be.revertedWith('User already has a token')
