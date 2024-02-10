@@ -17,9 +17,9 @@ const config: HardhatUserConfig = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 10000
+        runs: 1000000,
       },
-      evmVersion: 'shanghai'
+      evmVersion: 'shanghai',
     },
   },
   networks: {
@@ -28,7 +28,7 @@ const config: HardhatUserConfig = {
       accounts: [`0x${process.env.DEPLOYER_PRIVATE_KEY}`],
       // 5000000000 = 5 gwei
       gasPrice: 5000000000,
-    }
+    },
   },
 }
 
