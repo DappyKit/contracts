@@ -1,5 +1,6 @@
 import { HardhatUserConfig } from 'hardhat/config'
 import '@nomicfoundation/hardhat-toolbox'
+import '@nomicfoundation/hardhat-verify'
 import '@openzeppelin/hardhat-upgrades'
 import 'dotenv/config'
 
@@ -29,6 +30,22 @@ const config: HardhatUserConfig = {
       // 5000000000 = 5 gwei
       gasPrice: 5000000000,
     },
+  },
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY,
+    customChains: [
+      {
+        network: 'sepoliaOptimism',
+        chainId: 11155420,
+        urls: {
+          apiURL: 'https://api-sepolia-optimism.etherscan.io/api?module=contract',
+          browserURL: 'https://sepolia-optimism.etherscan.io/',
+        },
+      },
+    ],
+  },
+  sourcify: {
+    enabled: true,
   },
 }
 
