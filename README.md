@@ -28,6 +28,7 @@ Network: [Optimism Sepolia](https://sepolia-optimism.etherscan.io/)
 ```shell
 # copy and fill the env file with the correct data
 cp example.env .env
+
 # deploy all the contracts to the testnet
 npx hardhat run --network testnet scripts/deploy-dappy.ts
 ```
@@ -35,11 +36,14 @@ npx hardhat run --network testnet scripts/deploy-dappy.ts
 ## Testing smart contracts without ERC-4337
 
 ```shell
+# install dependencies
 npm ci
+
+# test the contracts
 npx hardhat test
 ```
 
-## Testing smart contracts with ERC-4337
+## Testing smart contracts with ERC-4337 (not ready)
 
 1. Install dependencies
 ```shell
