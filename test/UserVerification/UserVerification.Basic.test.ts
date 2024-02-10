@@ -202,16 +202,26 @@ describe('UserVerification', () => {
 
       await userVerification.issueToken(owner.address, tokenId)
       await expect(userVerification.transferFrom(owner.address, otherAccount.address, tokenId)).to.be.revertedWith(
-        'Token not transferable',
+        'Soulbound tokens cannot be transferred',
       )
     })
 
-    it('should not allow safe transfer of a token', async () => {
+    it('should not allow safe transfer of a token with data', async () => {
       const { userVerification, owner, otherAccount, tokenId } = await loadFixture(deployUserVerificationFixture)
 
       // to prevent error: TypeError: ambiguous function description (i.e. matches "safeTransferFrom(address,address,uint256)", "safeTransferFrom(address,address,uint256,bytes)") (argument="key", value="safeTransferFrom", code=INVALID_ARGUMENT, version=6.8.1)
       const method = 'safeTransferFrom(address,address,uint256,bytes)'
       await expect(userVerification[method](owner.address, otherAccount.address, tokenId, '0x')).to.be.revertedWith(
+        'Soulbound tokens cannot be transferred',
+      )
+    })
+
+    it('should not allow safe transfer of a token without data', async () => {
+      const { userVerification, owner, otherAccount, tokenId } = await loadFixture(deployUserVerificationFixture)
+
+      // to prevent error: TypeError: ambiguous function description (i.e. matches "safeTransferFrom(address,address,uint256)", "safeTransferFrom(address,address,uint256,bytes)") (argument="key", value="safeTransferFrom", code=INVALID_ARGUMENT, version=6.8.1)
+      const method = 'safeTransferFrom(address,address,uint256)'
+      await expect(userVerification[method](owner.address, otherAccount.address, tokenId)).to.be.revertedWith(
         'Soulbound tokens cannot be transferred',
       )
     })

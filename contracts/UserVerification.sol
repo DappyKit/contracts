@@ -184,4 +184,11 @@ contract UserVerification is Initializable, ERC721Upgradeable, ERC721BurnableUpg
     function safeTransferFrom(address /* from */, address /* to */, uint256 /* tokenId */, bytes memory /* data */) public pure override {
         revert("Soulbound tokens cannot be transferred");
     }
+
+    /**
+     * @dev Override the transferFrom function to prevent token transfers.
+     */
+    function transferFrom(address /* from */, address /* to */, uint256 /* tokenId */) public pure override {
+        revert("Soulbound tokens cannot be transferred");
+    }
 }
