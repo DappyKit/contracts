@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import { ethers } from 'hardhat'
 import { getMultiHash } from '../utils/data'
 
-describe('SocialConnections', function () {
+describe('SocialConnections', () => {
   async function deploySocialConnectionsFixture() {
     const [owner, otherAccount] = await ethers.getSigners()
 
@@ -11,21 +11,23 @@ describe('SocialConnections', function () {
     const socialConnections = await SocialConnections.deploy()
     await socialConnections.initialize(owner.address)
 
-    return {socialConnections, owner, otherAccount}
+    return { socialConnections, owner, otherAccount }
   }
 
-  describe('initialize', function () {
-    it('should not initialize more than once', async function () {
-      const [owner, otherAccount] = await ethers.getSigners()
-      const {socialConnections} = await loadFixture(deploySocialConnectionsFixture)
+  describe('initialize', () => {
+    it('should not initialize more than once', async () => {
+      const [owner] = await ethers.getSigners()
+      const { socialConnections } = await loadFixture(deploySocialConnectionsFixture)
 
-      await expect(socialConnections.initialize(owner.address)).to.eventually.be.rejectedWith('VM Exception while processing transaction: reverted with custom error \'InvalidInitialization()')
+      await expect(socialConnections.initialize(owner.address)).to.eventually.be.rejectedWith(
+        "VM Exception while processing transaction: reverted with custom error 'InvalidInitialization()",
+      )
     })
   })
 
-  describe('setServiceConnection', function () {
-    it('should set a Multihash for the service account', async function () {
-      const {socialConnections, owner} = await loadFixture(deploySocialConnectionsFixture)
+  describe('setServiceConnection', () => {
+    it('should set a Multihash for the service account', async () => {
+      const { socialConnections, owner } = await loadFixture(deploySocialConnectionsFixture)
 
       const multihash = getMultiHash('hello')
       await socialConnections.connect(owner).setServiceConnection(multihash)
@@ -33,17 +35,17 @@ describe('SocialConnections', function () {
     })
   })
 
-  describe('setUserConnection', function () {
-    it('should set a Multihash for the user account', async function () {
-      const {socialConnections, owner} = await loadFixture(deploySocialConnectionsFixture)
+  describe('setUserConnection', () => {
+    it('should set a Multihash for the user account', async () => {
+      const { socialConnections, owner } = await loadFixture(deploySocialConnectionsFixture)
 
       const multihash = getMultiHash('hello')
       await socialConnections.connect(owner).setUserConnection(multihash)
       expect(await socialConnections.userConnections(owner.address)).to.deep.equal(Object.values(multihash))
     })
 
-    it('should overwrite existing data with new data for the same user account', async function () {
-      const {socialConnections, owner} = await loadFixture(deploySocialConnectionsFixture)
+    it('should overwrite existing data with new data for the same user account', async () => {
+      const { socialConnections, owner } = await loadFixture(deploySocialConnectionsFixture)
 
       const initialMultihash = getMultiHash('initial')
       await socialConnections.connect(owner).setUserConnection(initialMultihash)
@@ -54,8 +56,8 @@ describe('SocialConnections', function () {
       expect(await socialConnections.userConnections(owner.address)).to.deep.equal(Object.values(newMultihash))
     })
 
-    it('should prevent a user from storing a Multihash for another user\'s account', async function () {
-      const {socialConnections, owner, otherAccount} = await loadFixture(deploySocialConnectionsFixture)
+    it("should prevent a user from storing a Multihash for another user's account", async () => {
+      const { socialConnections, owner, otherAccount } = await loadFixture(deploySocialConnectionsFixture)
 
       const initialMultihash = getMultiHash('initial')
       const initialMultihash2 = getMultiHash('initial2')
@@ -63,13 +65,15 @@ describe('SocialConnections', function () {
       await socialConnections.connect(otherAccount).setUserConnection(initialMultihash2)
 
       expect(await socialConnections.userConnections(owner.address)).to.deep.equal(Object.values(initialMultihash))
-      expect(await socialConnections.userConnections(otherAccount.address)).to.deep.equal(Object.values(initialMultihash2))
+      expect(await socialConnections.userConnections(otherAccount.address)).to.deep.equal(
+        Object.values(initialMultihash2),
+      )
     })
   })
 
-  describe('removeConnection', function () {
-    it('should remove the Multihash associated with the user\'s account', async function () {
-      const {socialConnections, owner} = await loadFixture(deploySocialConnectionsFixture)
+  describe('removeConnection', () => {
+    it("should remove the Multihash associated with the user's account", async () => {
+      const { socialConnections, owner } = await loadFixture(deploySocialConnectionsFixture)
 
       const multihash = getMultiHash('hello')
 

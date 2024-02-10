@@ -11,9 +11,9 @@ export const ONE_YEAR = 31536000
  * @property {number} size - The size of the hash value in bytes.
  */
 export interface MultiHash {
-  hash: string;
-  hashFunction: number;
-  size: number;
+  hash: string
+  hashFunction: number
+  size: number
 }
 
 /**
@@ -26,6 +26,14 @@ export function getMultiHash(data: string): MultiHash {
   return {
     hash: ethers.keccak256(ethers.toUtf8Bytes(data)),
     hashFunction: 12,
-    size: 32
+    size: 32,
   }
+}
+
+/**
+ * Generates a bytes32 hash from the given data.
+ * @param data The data to generate the hash from.
+ */
+export function getBytes32Hash(data: string): string {
+  return ethers.keccak256(ethers.toUtf8Bytes(data))
 }

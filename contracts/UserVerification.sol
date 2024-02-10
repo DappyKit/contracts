@@ -14,7 +14,6 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
  * revocation, and reissuance of tokens, as well as checking their validity and expiration status.
  */
 contract UserVerification is Initializable, ERC721Upgradeable, ERC721BurnableUpgradeable, OwnableUpgradeable, UUPSUpgradeable {
-    uint256 private _tokenId;
     mapping(address => uint256) private _userTokens;
     mapping(uint256 => uint256) private _tokenExpiryTimes;
     uint256 private _defaultExpiryDuration;
@@ -44,11 +43,13 @@ contract UserVerification is Initializable, ERC721Upgradeable, ERC721BurnableUpg
     /**
      * @dev Issues a new token to a user if they don't already have one.
      * @param user The address to which the token will be issued.
+     * @param tokenId The ID of the token to be issued.
      */
-    function issueToken(address user) public onlyOwner {
-        require(_userTokens[user] == 0, "User already has a token");
+    function issueToken(address user, bytes32 tokenId) external onlyOwner {
+        uint256 _tokenId = uint256(tokenId);
+        require(!tokenExists(_tokenId), "Token should not exist");
+        require(balanceOf(user) == 0, "User already has a token");
 
-        _tokenId++;
         _safeMint(user, _tokenId);
         _userTokens[user] = _tokenId;
         _setTokenExpiry(_tokenId, block.timestamp + _defaultExpiryDuration);
@@ -58,53 +59,22 @@ contract UserVerification is Initializable, ERC721Upgradeable, ERC721BurnableUpg
      * @dev Revokes a token from a user.
      * @param tokenId The ID of the token to be revoked.
      */
-    function revokeToken(uint256 tokenId) public onlyOwner {
-        require(tokenExists(tokenId), "Token does not exist");
-        address tokenOwner = ownerOf(tokenId);
-        _burn(tokenId);
+    function revokeToken(bytes32 tokenId) external onlyOwner {
+        uint256 _tokenId = uint256(tokenId);
+        require(tokenExists(_tokenId), "Token does not exist");
+        address tokenOwner = ownerOf(_tokenId);
+        _burn(_tokenId);
         delete _userTokens[tokenOwner];
-        delete _tokenExpiryTimes[tokenId];
-    }
-
-    /**
-     * @dev Reissues a token to a new user, burning the old one if it exists.
-     * If the new user already has a token, the operation is skipped.
-     * @param oldUser The address of the old user account.
-     * @param newUser The address of the new user account.
-     */
-    function reissueToken(address oldUser, address newUser) public onlyOwner {
-        uint256 oldUserTokenId = _userTokens[oldUser];
-        if (oldUserTokenId != 0) {
-            _burn(oldUserTokenId);
-            delete _userTokens[oldUser];
-        }
-
-        if (_userTokens[newUser] != 0) {
-            return;
-        }
-
-        _tokenId++;
-        _safeMint(newUser, _tokenId);
-        _userTokens[newUser] = _tokenId;
-        _setTokenExpiry(_tokenId, block.timestamp + _defaultExpiryDuration);
+        delete _tokenExpiryTimes[_tokenId];
     }
 
     /**
      * @dev Extends the expiry time of a token.
      * @param tokenId The ID of the token whose expiry is to be extended.
      */
-    function extendTokenExpiry(uint256 tokenId) public onlyOwner {
+    function extendTokenExpiry(uint256 tokenId) external onlyOwner {
         require(tokenExists(tokenId), "Token does not exist");
         _setTokenExpiry(tokenId, block.timestamp + _defaultExpiryDuration);
-    }
-
-    /**
-     * @dev Checks if a user has a token.
-     * @param user The address of the user.
-     * @return bool True if the user has a token, false otherwise.
-     */
-    function hasToken(address user) public view returns (bool) {
-        return _userTokens[user] != 0;
     }
 
     /**
@@ -128,16 +98,22 @@ contract UserVerification is Initializable, ERC721Upgradeable, ERC721BurnableUpg
     }
 
     /**
-     * @dev Sets the expiry time for a token.
-     * @param tokenId The ID of the token.
-     * @param expiryTime The expiry time to be set for the token.
+     * @dev Returns the time remaining before the token expires.
+     * @param tokenId The ID of the token to check.
+     * @return uint256 The time in seconds until the token expires, or 0 if it is already expired.
      */
-    function _setTokenExpiry(uint256 tokenId, uint256 expiryTime) private {
-        _tokenExpiryTimes[tokenId] = expiryTime;
+    function timeBeforeExpiration(uint256 tokenId) public view returns (uint256) {
+        require(tokenExists(tokenId), "Token does not exist");
+
+        if(block.timestamp > _tokenExpiryTimes[tokenId]) {
+            return 0;
+        }
+
+        return _tokenExpiryTimes[tokenId] - block.timestamp;
     }
 
     /**
-     * @dev Public function to check if a token exists.
+     * @dev Checks if a token exists.
      * Utilizes the ownerOf function from the ERC721Upgradeable implementation which reverts if the token does not exist.
      * @param tokenId The ID of the token to check.
      * @return bool Returns true if the token exists, false otherwise.
@@ -148,5 +124,71 @@ contract UserVerification is Initializable, ERC721Upgradeable, ERC721BurnableUpg
         } catch {
             return false;
         }
+    }
+
+    /**
+     * @dev Sets the expiry time for a token.
+     * @param tokenId The ID of the token.
+     * @param expiryTime The expiry time to be set for the token.
+     */
+    function _setTokenExpiry(uint256 tokenId, uint256 expiryTime) private {
+        _tokenExpiryTimes[tokenId] = expiryTime;
+    }
+
+    /**
+     * @dev Overrides the `_update` function to enforce non-transferability of tokens.
+     * Allows only minting (when `from` is the zero address) and burning (when `to` is the zero address).
+     * Reverts on attempts to transfer tokens between non-zero addresses.
+     * @param to The address receiving the token. For minting, this is the new owner's address; for burning, it should be the zero address.
+     * @param tokenId The ID of the token being minted, burned, or erroneously transferred.
+     * @param auth The address authorized to perform the operation. Unused in this override.
+     * @return The address from which the token is being transferred. Returns the zero address for minting operations.
+     */
+    function _update(address to, uint256 tokenId, address auth) internal override returns (address) {
+        address from = _ownerOf(tokenId);
+        require(from == address(0) || to == address(0), "Token not transferable");
+        return super._update(to, tokenId, auth);
+    }
+
+    /**
+     * @dev Override the approve function to prevent token approvals.
+     */
+    function approve(address /* to */, uint256 /* tokenId */) public pure override {
+        revert("Soulbound tokens cannot be approved for transfer");
+    }
+
+    /**
+     * @dev Override the setApprovalForAll function to prevent setting operator approvals.
+     */
+    function setApprovalForAll(address /* operator */, bool /* approved */) public pure override {
+        revert("Soulbound tokens cannot set operator approvals");
+    }
+
+    /**
+     * @dev Override the getApproved function to indicate no approvals are allowed.
+     */
+    function getApproved(uint256 /* tokenId */) public pure override returns (address) {
+        return address(0);
+    }
+
+    /**
+     * @dev Override the isApprovedForAll function to indicate no operator approvals are allowed.
+     */
+    function isApprovedForAll(address /* owner */, address /* operator */) public pure override returns (bool) {
+        return false;
+    }
+
+    /**
+     * @dev Override the safeTransferFrom function to prevent token transfers.
+     */
+    function safeTransferFrom(address /* from */, address /* to */, uint256 /* tokenId */, bytes memory /* data */) public pure override {
+        revert("Soulbound tokens cannot be transferred");
+    }
+
+    /**
+     * @dev Override the transferFrom function to prevent token transfers.
+     */
+    function transferFrom(address /* from */, address /* to */, uint256 /* tokenId */) public pure override {
+        revert("Soulbound tokens cannot be transferred");
     }
 }

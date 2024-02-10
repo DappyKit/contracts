@@ -19,27 +19,34 @@ The following contracts are available in the repository:
 Network: [Optimism Sepolia](https://sepolia-optimism.etherscan.io/)
 
 - `LightAccountFactory.sol`: [0x00000055C0b4fA41dde26A74435ff03692292FBD](https://sepolia-optimism.etherscan.io/address/0x00000055C0b4fA41dde26A74435ff03692292FBD) by [Alchemy](https://docs.alchemy.com/reference/factory-addresses#testnet-deployments)
-- `SocialConnections.sol`: [0xD8FC858221428B6b8ce304CE7aF1E838067Ea806](https://sepolia-optimism.etherscan.io/address/0xD8FC858221428B6b8ce304CE7aF1E838067Ea806)
-- `FilesystemChanges.sol`: [0x204B8968E70084cDCBad327614334F1D7553aaF2](https://sepolia-optimism.etherscan.io/address/0x204B8968E70084cDCBad327614334F1D7553aaF2)
-- `UserVerification.sol`: [0xBA44aaa2809931401ec099D798A5376cd678a12a](https://sepolia-optimism.etherscan.io/address/0xBA44aaa2809931401ec099D798A5376cd678a12a)
+- `SocialConnections.sol`: [0xD8FC858221428B6b8ce304CE7aF1E838067Ea806](https://sepolia-optimism.etherscan.io/address/0xD8FC858221428B6b8ce304CE7aF1E838067Ea806) (v1.0.0)
+- `FilesystemChanges.sol`: [0x204B8968E70084cDCBad327614334F1D7553aaF2](https://sepolia-optimism.etherscan.io/address/0x204B8968E70084cDCBad327614334F1D7553aaF2) (v1.0.0)
+- `UserVerification.sol`: [0x21d94f7d26A21C9aC6b61533565E26Deb97AaF32](https://sepolia-optimism.etherscan.io/address/0x21d94f7d26A21C9aC6b61533565E26Deb97AaF32) (v1.0.1)
 
 ## Deploy contracts
 
 ```shell
 # copy and fill the env file with the correct data
 cp example.env .env
+
 # deploy all the contracts to the testnet
 npx hardhat run --network testnet scripts/deploy-dappy.ts
+
+# verify on Sourcify and Etherscan
+npx hardhat verify --network testnet DEPLOYED_CONTRACT_ADDRESS
 ```
 
 ## Testing smart contracts without ERC-4337
 
 ```shell
+# install dependencies
 npm ci
+
+# test the contracts
 npx hardhat test
 ```
 
-## Testing smart contracts with ERC-4337
+## Testing smart contracts with ERC-4337 (not ready)
 
 1. Install dependencies
 ```shell
