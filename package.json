@@ -4,7 +4,9 @@
   "description": "DappyKit smart contracts",
   "scripts": {
     "test": "hardhat test",
-    "lint:check": "eslint \"test/**/*.ts\" \"scripts/**/*.ts\" && prettier --check \"test/**/*.ts\" \"scripts/**/*.ts\""
+    "lint:check": "eslint \"test/**/*.ts\" \"scripts/**/*.ts\" && prettier --check \"test/**/*.ts\" \"scripts/**/*.ts\"",
+    "deploy-local": "npx hardhat run scripts/deploy-dappy.ts",
+    "deploy-op-sepolia": "npx hardhat run --network testnet scripts/deploy-dappy.ts"
   },
   "keywords": [
     "dappykit",
