@@ -25,15 +25,31 @@ Network: [Optimism Sepolia](https://sepolia-optimism.etherscan.io/)
 
 ## Deploy contracts
 
+### Local
+
 ```shell
 # copy and fill the env file with the correct data
 cp example.env .env
 
-# deploy all the contracts to the testnet
-npx hardhat run --network testnet scripts/deploy-dappy.ts
+# deploy all the contracts to the local node
+npm run deploy-local
+
+# the deployed addresses will be saved in `dappy-contracts/deployed-contracts.json`
+```
+
+### Testnet
+
+```shell
+# copy and fill the env file with the correct data
+cp example.env .env
+
+# deploy all the contracts to Optimism Sepolia
+npm run deploy-op-sepolia
 
 # verify on Sourcify and Etherscan
 npx hardhat verify --network testnet DEPLOYED_CONTRACT_ADDRESS
+
+# the deployed addresses will be saved in `dappy-contracts/deployed-contracts.json`
 ```
 
 ## Testing smart contracts without ERC-4337
