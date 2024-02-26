@@ -14,98 +14,164 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
  * revocation, and reissuance of tokens, as well as checking their validity and expiration status.
  */
 contract UserVerification is Initializable, ERC721Upgradeable, ERC721BurnableUpgradeable, OwnableUpgradeable, UUPSUpgradeable {
+    /// @notice Indicates if an address is a manager
+    mapping(address => bool) public isManager;
+
+    /// @notice Default duration until a token expires in seconds
+    uint256 public defaultExpiryDuration;
+
+    /// @dev Mapping from user address to their token ID
     mapping(address => uint256) private _userTokens;
+
+    /// @dev Mapping from token ID to its expiry time
     mapping(uint256 => uint256) private _tokenExpiryTimes;
-    uint256 private _defaultExpiryDuration;
+
+    /// @notice Ensures the function is called by a manager
+    /// @dev Modifier that requires the caller to be marked as a manager in `isManager` mapping.
+    modifier onlyManagers() {
+        require(isManager[_msgSender()], "Only managers can call this function");
+        _;
+    }
+
+    /// @notice Emitted when a manager is set or unset
+    event ManagerSet(address manager, bool flag);
+
+    /// @notice Emitted when the default expiry duration is changed
+    event DefaultExpiryDurationChanged(uint256 newDuration);
 
     /**
      * @dev Initializes the contract with the given name, symbol, and default expiry duration.
      * @param initialOwner The address of the initial owner.
      * @param name The name of the token.
      * @param symbol The symbol of the token.
-     * @param defaultExpiryDuration The default duration (in seconds) until a token expires.
+     * @param expiryDuration The default duration (in seconds) until a token expires.
      */
     function initialize(
         address initialOwner,
         string memory name,
         string memory symbol,
-        uint256 defaultExpiryDuration
+        uint256 expiryDuration
     ) public initializer {
         __ERC721_init(name, symbol);
         __ERC721Burnable_init();
         __Ownable_init(initialOwner);
         __UUPSUpgradeable_init();
-        _defaultExpiryDuration = defaultExpiryDuration;
+        address[] memory managers = new address[](1);
+        managers[0] = initialOwner;
+        _setManagers(managers, true);
+        _setDefaultExpiryDuration(expiryDuration);
     }
 
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
     /**
-     * @dev Issues a new token to a user if they don't already have one.
-     * @param user The address to which the token will be issued.
-     * @param tokenId The ID of the token to be issued.
+     * @notice Sets the manager status for a list of addresses
+     * @dev Can only be called by the contract owner.
+     * @param managers An array of addresses whose manager status will be set
+     * @param flag True to set as managers, false to remove manager status
      */
-    function issueToken(address user, bytes32 tokenId) external onlyOwner {
-        uint256 _tokenId = uint256(tokenId);
-        require(!tokenExists(_tokenId), "Token should not exist");
+    function setManagers(address[] calldata managers, bool flag) external onlyOwner {
+        _setManagers(managers, flag);
+    }
+
+    // @dev Private function to set or unset the manager status for a list of addresses.
+    // @param managers An array of addresses whose manager status is being modified.
+    // @param flag If true, the addresses are set as managers; if false, the manager status is removed.
+    function _setManagers(address[] memory managers, bool flag) private {
+        for (uint256 i = 0; i < managers.length; i++) {
+            isManager[managers[i]] = flag;
+            emit ManagerSet(managers[i], flag);
+        }
+    }
+
+    /**
+     * @notice Sets the default expiry duration for new tokens
+     * @dev Can only be called by the contract owner. Emits `DefaultExpiryDurationChanged` event upon success.
+     * @param newDuration The new default expiry duration in seconds
+     */
+    function setDefaultExpiryDuration(uint256 newDuration) external onlyOwner {
+        _setDefaultExpiryDuration(newDuration);
+    }
+
+    /**
+     * @dev Sets the default expiry duration for tokens. This internal function updates the state variable and emits an event.
+     * @param newDuration The new default expiry duration in seconds. This duration will apply to all tokens issued after the change.
+     */
+    function _setDefaultExpiryDuration(uint256 newDuration) private {
+        defaultExpiryDuration = newDuration;
+        emit DefaultExpiryDurationChanged(newDuration);
+    }
+
+    /**
+     * @notice Issues a new Soulbound Token to a user
+     * @dev Mints a new token and sets its expiry. Reverts if the user already has a token or the token ID exists.
+     * @param user Address to which the token will be issued
+     * @param tokenId ID of the token to be issued
+     */
+    function issueToken(address user, uint256 tokenId) external onlyManagers {
+        require(!tokenExists(tokenId), "Token already exists");
         require(balanceOf(user) == 0, "User already has a token");
 
-        _safeMint(user, _tokenId);
-        _userTokens[user] = _tokenId;
-        _setTokenExpiry(_tokenId, block.timestamp + _defaultExpiryDuration);
+        _safeMint(user, tokenId);
+        _userTokens[user] = tokenId;
+        _setTokenExpiry(tokenId, block.timestamp + defaultExpiryDuration);
     }
 
     /**
-     * @dev Revokes a token from a user.
-     * @param tokenId The ID of the token to be revoked.
+     * @notice Revokes a token from a user
+     * @dev Burns the token and clears its associated data. Reverts if the token doesn't exist.
+     * @param tokenId ID of the token to be revoked
      */
-    function revokeToken(bytes32 tokenId) external onlyOwner {
-        uint256 _tokenId = uint256(tokenId);
-        require(tokenExists(_tokenId), "Token does not exist");
-        address tokenOwner = ownerOf(_tokenId);
-        _burn(_tokenId);
-        delete _userTokens[tokenOwner];
-        delete _tokenExpiryTimes[_tokenId];
-    }
-
-    /**
-     * @dev Extends the expiry time of a token.
-     * @param tokenId The ID of the token whose expiry is to be extended.
-     */
-    function extendTokenExpiry(uint256 tokenId) external onlyOwner {
+    function revokeToken(uint256 tokenId) external onlyManagers {
         require(tokenExists(tokenId), "Token does not exist");
-        _setTokenExpiry(tokenId, block.timestamp + _defaultExpiryDuration);
+        address tokenOwner = ownerOf(tokenId);
+        _burn(tokenId);
+        delete _userTokens[tokenOwner];
+        delete _tokenExpiryTimes[tokenId];
     }
 
     /**
-     * @dev Returns the token ID associated with a user.
-     * @param user The address of the user.
-     * @return uint256 The token ID.
+     * @notice Extends the expiry time of a token
+     * @dev Sets the token's expiry time to the current block timestamp plus the default expiry duration.
+     * @param tokenId ID of the token whose expiry is to be extended
      */
-    function getTokenId(address user) public view returns (uint256) {
+    function extendTokenExpiry(uint256 tokenId) external onlyManagers {
+        require(tokenExists(tokenId), "Token does not exist");
+        _setTokenExpiry(tokenId, block.timestamp + defaultExpiryDuration);
+    }
+
+    /**
+     * @notice Returns the token ID associated with a user address
+     * @dev Reverts if the user does not have a token.
+     * @param user Address of the user
+     * @return uint256 ID of the token owned by the user
+     */
+    function getTokenId(address user) external view returns (uint256) {
         require(_userTokens[user] != 0, "User does not have a token");
         return _userTokens[user];
     }
 
     /**
-     * @dev Checks if a token is expired.
-     * @param tokenId The ID of the token to check.
-     * @return bool True if the token is expired, false otherwise.
+     * @notice Checks if a token is expired
+     * @dev Compares the current block timestamp with the token's expiry time.
+     * @param tokenId ID of the token to check
+     * @return bool True if the token is expired, false otherwise
      */
-    function isTokenExpired(uint256 tokenId) public view returns (bool) {
+    function isTokenExpired(uint256 tokenId) external view returns (bool) {
         require(tokenExists(tokenId), "Token does not exist");
         return block.timestamp > _tokenExpiryTimes[tokenId];
     }
 
     /**
-     * @dev Returns the time remaining before the token expires.
-     * @param tokenId The ID of the token to check.
-     * @return uint256 The time in seconds until the token expires, or 0 if it is already expired.
+     * @notice Calculates the time remaining before a token expires
+     * @dev Returns 0 if the token is already expired.
+     * @param tokenId ID of the token to check
+     * @return uint256 Time in seconds until the token expires, or 0 if it is already expired
      */
-    function timeBeforeExpiration(uint256 tokenId) public view returns (uint256) {
+    function timeBeforeExpiration(uint256 tokenId) external view returns (uint256) {
         require(tokenExists(tokenId), "Token does not exist");
 
-        if(block.timestamp > _tokenExpiryTimes[tokenId]) {
+        if (block.timestamp > _tokenExpiryTimes[tokenId]) {
             return 0;
         }
 
@@ -113,10 +179,10 @@ contract UserVerification is Initializable, ERC721Upgradeable, ERC721BurnableUpg
     }
 
     /**
-     * @dev Checks if a token exists.
-     * Utilizes the ownerOf function from the ERC721Upgradeable implementation which reverts if the token does not exist.
-     * @param tokenId The ID of the token to check.
-     * @return bool Returns true if the token exists, false otherwise.
+     * @notice Checks if a token exists
+     * @dev Utilizes the `ownerOf` function which reverts if the token does not exist.
+     * @param tokenId ID of the token to check
+     * @return bool True if the token exists, false otherwise
      */
     function tokenExists(uint256 tokenId) public view returns (bool) {
         try this.ownerOf(tokenId) {

@@ -31,8 +31,8 @@ Network: [Optimism Sepolia](https://sepolia-optimism.etherscan.io/)
 # copy and fill the env file with the correct data
 cp example.env .env
 
-# deploy all the contracts to the local node
-npm run deploy-local
+# deploy all the contracts to the test node
+npm run deploy-test
 
 # the deployed addresses will be saved in `dappy-contracts/deployed-contracts.json`
 ```

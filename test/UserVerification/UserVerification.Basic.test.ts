@@ -7,7 +7,7 @@ const EXPIRED_TOKEN_SECONDS = 100
 
 describe('UserVerification', () => {
   async function deployUserVerificationFixture(expired = EXPIRED_TOKEN_SECONDS) {
-    const [owner, otherAccount] = await ethers.getSigners()
+    const [owner, otherAccount, account3, account4] = await ethers.getSigners()
 
     const tokenId = getBytes32Hash('google.1234567890098765')
     const tokenId2 = getBytes32Hash('google.1234567890098766')
@@ -15,7 +15,7 @@ describe('UserVerification', () => {
     const userVerification = await UserVerification.deploy()
     await userVerification.initialize(owner.address, 'UserVerificationToken', 'UVT', expired)
 
-    return { userVerification, owner, otherAccount, tokenId, tokenId2 }
+    return { userVerification, owner, otherAccount, tokenId, tokenId2, account3, account4 }
   }
 
   describe('initialize', () => {
@@ -25,6 +25,7 @@ describe('UserVerification', () => {
       await expect(userVerification.initialize(owner.address, 'UserVerificationToken', 'UVT', ONE_YEAR)).to.be.reverted
     })
   })
+  // todo cover with test where not owner trying to do something
 
   describe('issueToken', () => {
     it('should issue a new token', async () => {
@@ -41,7 +42,7 @@ describe('UserVerification', () => {
 
       await userVerification.issueToken(owner.address, tokenId)
       await expect(userVerification.issueToken(owner.address, tokenId2)).to.be.revertedWith('User already has a token')
-      await expect(userVerification.issueToken(wallet2.address, tokenId)).to.be.revertedWith('Token should not exist')
+      await expect(userVerification.issueToken(wallet2.address, tokenId)).to.be.revertedWith('Token already exists')
     })
   })
 
@@ -239,6 +240,140 @@ describe('UserVerification', () => {
       await expect(userVerification.setApprovalForAll(otherAccount.address, true)).to.be.revertedWith(
         'Soulbound tokens cannot set operator approvals',
       )
+    })
+  })
+
+  describe('onlyManagers Modifier', () => {
+    // async function deployUserVerificationFixture() {
+    //   const [owner, manager, nonManager] = await ethers.getSigners()
+    //   const UserVerification = await ethers.getContractFactory('UserVerification')
+    //   const userVerification = await UserVerification.deploy()
+    //   await userVerification.initialize(owner.address, 'UserVerificationToken', 'UVT', ONE_YEAR)
+    //   // Set manager as a manager
+    //   await userVerification.setManagers([manager.address], true)
+    //
+    //   return { userVerification, owner, manager, nonManager }
+    // }
+
+    describe('Access Control', () => {
+      it('should allow managers to issue tokens', async () => {
+        const {
+          userVerification,
+          otherAccount,
+          account3: manager,
+          tokenId,
+        } = await loadFixture(deployUserVerificationFixture)
+        await userVerification.setManagers([manager.address], true)
+        await expect(userVerification.connect(manager).issueToken(otherAccount.address, tokenId))
+          .to.emit(userVerification, 'Transfer')
+          .withArgs(ethers.ZeroAddress, otherAccount.address, tokenId)
+      })
+
+      it('should prevent non-managers from issuing tokens', async () => {
+        const {
+          userVerification,
+          otherAccount,
+          account3: notManager,
+          tokenId,
+        } = await loadFixture(deployUserVerificationFixture)
+        await expect(userVerification.connect(notManager).issueToken(otherAccount.address, tokenId)).to.be.revertedWith(
+          'Only managers can call this function',
+        )
+      })
+
+      it('should allow managers to revoke tokens', async () => {
+        const {
+          userVerification,
+          account3: manager,
+          account4,
+          tokenId,
+        } = await loadFixture(deployUserVerificationFixture)
+
+        await userVerification.setManagers([manager.address], true)
+        await userVerification.connect(manager).issueToken(account4.address, tokenId)
+        expect(await userVerification.balanceOf(account4.address)).equal(1)
+        await expect(userVerification.connect(manager).revokeToken(tokenId))
+          .to.emit(userVerification, 'Transfer')
+          .withArgs(account4.address, ethers.ZeroAddress, tokenId)
+        expect(await userVerification.balanceOf(account4.address)).equal(0)
+      })
+
+      it('should prevent non-managers from revoking tokens', async () => {
+        const {
+          userVerification,
+          account3: manager,
+          account4,
+          tokenId,
+        } = await loadFixture(deployUserVerificationFixture)
+        await userVerification.setManagers([manager.address], true)
+        await userVerification.connect(manager).issueToken(account4.address, tokenId)
+        await expect(userVerification.connect(account4).revokeToken(tokenId)).to.be.revertedWith(
+          'Only managers can call this function',
+        )
+      })
+
+      it('should allow managers to extend token expiry', async () => {
+        const {
+          userVerification,
+          account3: manager,
+          account4,
+          tokenId,
+        } = await loadFixture(deployUserVerificationFixture)
+        await userVerification.setManagers([manager.address], true)
+        await userVerification.connect(manager).issueToken(account4.address, tokenId)
+        await expect(userVerification.connect(manager).extendTokenExpiry(tokenId)).to.not.be.reverted
+      })
+
+      it('should prevent non-managers from extending token expiry', async () => {
+        const {
+          userVerification,
+          account3: manager,
+          otherAccount,
+          account4,
+          tokenId,
+        } = await loadFixture(deployUserVerificationFixture)
+        await userVerification.setManagers([manager.address], true)
+        await userVerification.connect(manager).issueToken(otherAccount.address, tokenId)
+        await expect(userVerification.connect(account4).extendTokenExpiry(tokenId)).to.be.revertedWith(
+          'Only managers can call this function',
+        )
+      })
+
+      it('Manager issued a token, his rights removed and he tries to revoke the tokens but fails', async () => {
+        const {
+          userVerification,
+          otherAccount,
+          tokenId,
+          account3: manager,
+        } = await loadFixture(deployUserVerificationFixture)
+        // Set manager and issue a token
+        await userVerification.setManagers([manager.address], true)
+        await userVerification.connect(manager).issueToken(otherAccount.address, tokenId)
+        expect(await userVerification.balanceOf(otherAccount.address)).to.equal(1)
+
+        // Remove manager rights
+        await userVerification.setManagers([manager.address], false)
+
+        // Try to revoke the token as the now non-manager
+        await expect(userVerification.connect(manager).revokeToken(tokenId)).to.be.revertedWith(
+          'Only managers can call this function',
+        )
+      })
+
+      it('Set 10 managers in one operation, check that they have their power, remove their power and check it', async () => {
+        const { owner, userVerification } = await loadFixture(deployUserVerificationFixture)
+        // eslint-disable-next-line max-nested-callbacks
+        const managers = Array.from({ length: 10 }, () => ethers.Wallet.createRandom().connect(owner.provider))
+        await userVerification.setManagers(managers, true)
+        for (const manager of managers) {
+          expect(await userVerification.isManager(manager.address)).equal(true)
+        }
+
+        await userVerification.setManagers(managers, false)
+        for (const manager of managers) {
+          expect(await userVerification.isManager(manager.address)).equal(false)
+        }
+      })
     })
   })
 })
