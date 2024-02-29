@@ -21,7 +21,7 @@ Network: [Optimism Sepolia](https://sepolia-optimism.etherscan.io/)
 - `LightAccountFactory.sol`: [0x00000055C0b4fA41dde26A74435ff03692292FBD](https://sepolia-optimism.etherscan.io/address/0x00000055C0b4fA41dde26A74435ff03692292FBD) by [Alchemy](https://docs.alchemy.com/reference/factory-addresses#testnet-deployments)
 - `SocialConnections.sol`: [0xD8FC858221428B6b8ce304CE7aF1E838067Ea806](https://sepolia-optimism.etherscan.io/address/0xD8FC858221428B6b8ce304CE7aF1E838067Ea806) (v1.0.0)
 - `FilesystemChanges.sol`: [0x204B8968E70084cDCBad327614334F1D7553aaF2](https://sepolia-optimism.etherscan.io/address/0x204B8968E70084cDCBad327614334F1D7553aaF2) (v1.0.0)
-- `UserVerification.sol`: [0x21d94f7d26A21C9aC6b61533565E26Deb97AaF32](https://sepolia-optimism.etherscan.io/address/0x21d94f7d26A21C9aC6b61533565E26Deb97AaF32) (v1.0.1)
+- `UserVerification.sol`: [0x721462E34DCC00F8Bd0f0cD07762cfd482a0Fcb4](https://sepolia-optimism.etherscan.io/address/0x721462E34DCC00F8Bd0f0cD07762cfd482a0Fcb4) (v1.0.2)
 
 ## Deploy contracts
 
@@ -31,8 +31,8 @@ Network: [Optimism Sepolia](https://sepolia-optimism.etherscan.io/)
 # copy and fill the env file with the correct data
 cp example.env .env
 
-# deploy all the contracts to the local node
-npm run deploy-local
+# deploy all the contracts to the test node
+npm run deploy-test
 
 # the deployed addresses will be saved in `dappy-contracts/deployed-contracts.json`
 ```
