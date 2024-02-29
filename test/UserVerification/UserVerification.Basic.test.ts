@@ -25,7 +25,6 @@ describe('UserVerification', () => {
       await expect(userVerification.initialize(owner.address, 'UserVerificationToken', 'UVT', ONE_YEAR)).to.be.reverted
     })
   })
-  // todo cover with test where not owner trying to do something
 
   describe('issueToken', () => {
     it('should issue a new token', async () => {
