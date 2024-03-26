@@ -109,7 +109,7 @@ contract UserVerification is Initializable, ERC721Upgradeable, ERC721BurnableUpg
      * @param tokenId ID of the token to be issued
      */
     function issueToken(address user, uint256 tokenId) external onlyManagers {
-        require(!tokenExists(tokenId), "Token already exists");
+        require(_ownerOf(tokenId) == address(0), "Token already exists");
         require(balanceOf(user) == 0, "User already has a token");
 
         _safeMint(user, tokenId);
@@ -123,7 +123,7 @@ contract UserVerification is Initializable, ERC721Upgradeable, ERC721BurnableUpg
      * @param tokenId ID of the token to be revoked
      */
     function revokeToken(uint256 tokenId) external onlyManagers {
-        require(tokenExists(tokenId), "Token does not exist");
+        require(_ownerOf(tokenId) != address(0), "Token does not exist");
         address tokenOwner = ownerOf(tokenId);
         _burn(tokenId);
         delete _userTokens[tokenOwner];
@@ -136,7 +136,7 @@ contract UserVerification is Initializable, ERC721Upgradeable, ERC721BurnableUpg
      * @param tokenId ID of the token whose expiry is to be extended
      */
     function extendTokenExpiry(uint256 tokenId) external onlyManagers {
-        require(tokenExists(tokenId), "Token does not exist");
+        require(_ownerOf(tokenId) != address(0), "Token does not exist");
         _setTokenExpiry(tokenId, block.timestamp + defaultExpiryDuration);
     }
 
@@ -158,7 +158,7 @@ contract UserVerification is Initializable, ERC721Upgradeable, ERC721BurnableUpg
      * @return bool True if the token is expired, false otherwise
      */
     function isTokenExpired(uint256 tokenId) external view returns (bool) {
-        require(tokenExists(tokenId), "Token does not exist");
+        require(_ownerOf(tokenId) != address(0), "Token does not exist");
         return block.timestamp > _tokenExpiryTimes[tokenId];
     }
 
@@ -169,7 +169,7 @@ contract UserVerification is Initializable, ERC721Upgradeable, ERC721BurnableUpg
      * @return uint256 Time in seconds until the token expires, or 0 if it is already expired
      */
     function timeBeforeExpiration(uint256 tokenId) external view returns (uint256) {
-        require(tokenExists(tokenId), "Token does not exist");
+        require(_ownerOf(tokenId) != address(0), "Token does not exist");
 
         if (block.timestamp > _tokenExpiryTimes[tokenId]) {
             return 0;

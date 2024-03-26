@@ -20,6 +20,7 @@ const config: HardhatUserConfig = {
         enabled: true,
         runs: 1000000,
       },
+      // https://soliditylang.org/blog/2023/05/10/solidity-0.8.20-release-announcement
       evmVersion: 'shanghai',
     },
   },
