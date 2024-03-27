@@ -8,6 +8,14 @@ if (!process.env.DEPLOYER_GATEWAY_URL) {
   throw new Error('DEPLOYER_GATEWAY_URL env variable not set')
 }
 
+if (!process.env.DEPLOYER_GATEWAY_URL_MAINNET) {
+  throw new Error('DEPLOYER_GATEWAY_URL_MAINNET env variable not set')
+}
+
+if (!process.env.DEPLOYER_PRIVATE_KEY_MAINNET) {
+  throw new Error('DEPLOYER_PRIVATE_KEY_MAINNET env variable not set')
+}
+
 if (!process.env.DEPLOYER_PRIVATE_KEY) {
   throw new Error('DEPLOYER_PRIVATE_KEY env variable not set')
 }
@@ -30,6 +38,10 @@ const config: HardhatUserConfig = {
       accounts: [`0x${process.env.DEPLOYER_PRIVATE_KEY}`],
       // 5000000000 = 5 gwei
       gasPrice: 5000000000,
+    },
+    mainnet: {
+      url: process.env.DEPLOYER_GATEWAY_URL_MAINNET,
+      accounts: [`0x${process.env.DEPLOYER_PRIVATE_KEY_MAINNET}`],
     },
   },
   etherscan: {
