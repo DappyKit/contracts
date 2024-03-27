@@ -16,12 +16,13 @@ The following contracts are available in the repository:
 
 ## Deployed contracts
 
-Network: [Optimism Sepolia](https://sepolia-optimism.etherscan.io/)
+|                               | OP Mainnet                                                                                                                       | OP Sepolia                                                                                                                                      |
+|-------------------------------|----------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| SocialConnections.sol         | [0xEbA1B39F0d9CF5B2619F95dEc6543eC258767fC2](https://optimistic.etherscan.io/address/0xeba1b39f0d9cf5b2619f95dec6543ec258767fc2) | [0xD8FC858221428B6b8ce304CE7aF1E838067Ea806](https://sepolia-optimism.etherscan.io/address/0xD8FC858221428B6b8ce304CE7aF1E838067Ea806) (v1.0.0) |
+| FilesystemChanges.sol         | [0x831EB58fA6b6E488811179B3dC19c5524059bA58](https://optimistic.etherscan.io/address/0x831EB58fA6b6E488811179B3dC19c5524059bA58) | [0x204B8968E70084cDCBad327614334F1D7553aaF2](https://sepolia-optimism.etherscan.io/address/0x204B8968E70084cDCBad327614334F1D7553aaF2) (v1.0.0) |
+| UserVerification.sol - Google | [0xf9bEDeCc559EC47D0Ffb7341dcaefc74450612A7](https://optimistic.etherscan.io/address/0xf9bEDeCc559EC47D0Ffb7341dcaefc74450612A7) | [0x721462E34DCC00F8Bd0f0cD07762cfd482a0Fcb4](https://sepolia-optimism.etherscan.io/address/0x721462E34DCC00F8Bd0f0cD07762cfd482a0Fcb4) (v1.0.3) |
 
 - `LightAccountFactory.sol`: [0x00000055C0b4fA41dde26A74435ff03692292FBD](https://sepolia-optimism.etherscan.io/address/0x00000055C0b4fA41dde26A74435ff03692292FBD) by [Alchemy](https://docs.alchemy.com/reference/factory-addresses#testnet-deployments)
-- `SocialConnections.sol`: [0xD8FC858221428B6b8ce304CE7aF1E838067Ea806](https://sepolia-optimism.etherscan.io/address/0xD8FC858221428B6b8ce304CE7aF1E838067Ea806) (v1.0.0)
-- `FilesystemChanges.sol`: [0x204B8968E70084cDCBad327614334F1D7553aaF2](https://sepolia-optimism.etherscan.io/address/0x204B8968E70084cDCBad327614334F1D7553aaF2) (v1.0.0)
-- `UserVerification.sol`: [0x721462E34DCC00F8Bd0f0cD07762cfd482a0Fcb4](https://sepolia-optimism.etherscan.io/address/0x721462E34DCC00F8Bd0f0cD07762cfd482a0Fcb4) (v1.0.3)
 
 ## Deploy contracts
 
@@ -49,7 +50,22 @@ npm run deploy-op-sepolia
 # verify on Sourcify and Etherscan
 npx hardhat verify --network testnet DEPLOYED_CONTRACT_ADDRESS
 
-# the deployed addresses will be saved in `dappy-contracts/deployed-contracts.json`
+# the deployed addresses will be saved in `./deployed-contracts.json`
+```
+
+### Mainnet
+
+```shell
+# copy and fill the env file with the correct data
+cp example.env .env
+
+# deploy all the contracts to Optimism Mainnet
+npm run deploy-op-mainnet
+
+# verify on Sourcify and Etherscan
+npx hardhat verify --network mainnet DEPLOYED_CONTRACT_ADDRESS
+
+# the deployed addresses will be saved in `./deployed-contracts.json`
 ```
 
 ## Testing smart contracts without ERC-4337
