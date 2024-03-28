@@ -8,7 +8,8 @@
     "deploy-test": "npx hardhat run scripts/deploy-dappy.ts",
     "deploy-localhost": "SOCIAL_CONNECTIONS_OWNER=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 FILESYSTEM_CHANGES_OWNER=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 USER_VERIFICATION_OWNER=0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 npx hardhat run scripts/deploy-dappy.ts --network localhost",
     "deploy-op-sepolia": "npx hardhat run --network testnet scripts/deploy-dappy.ts",
-    "deploy-op-mainnet": "npx hardhat run --network mainnet scripts/deploy-dappy.ts"
+    "deploy-op-mainnet": "npx hardhat run --network mainnet scripts/deploy-dappy.ts",
+    "set-managers-op-mainnet": "npx hardhat run --network mainnet scripts/set-managers.ts"
   },
   "keywords": [
     "dappykit",
