@@ -9,21 +9,9 @@ describe('SocialConnections', () => {
 
     const SocialConnections = await ethers.getContractFactory('SocialConnections')
     const socialConnections = await SocialConnections.deploy()
-    await socialConnections.initialize(owner.address)
 
     return { socialConnections, owner, otherAccount }
   }
-
-  describe('initialize', () => {
-    it('should not initialize more than once', async () => {
-      const [owner] = await ethers.getSigners()
-      const { socialConnections } = await loadFixture(deploySocialConnectionsFixture)
-
-      await expect(socialConnections.initialize(owner.address)).to.eventually.be.rejectedWith(
-        "VM Exception while processing transaction: reverted with custom error 'InvalidInitialization()",
-      )
-    })
-  })
 
   describe('setServiceConnection', () => {
     it('should set a Multihash for the service account', async () => {

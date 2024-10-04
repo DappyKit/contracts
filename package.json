@@ -3,11 +3,12 @@
   "version": "1.0.1",
   "description": "DappyKit smart contracts",
   "scripts": {
+    "all": "npm run lint:check && npm run test",
     "test": "hardhat test",
     "lint:check": "eslint \"test/**/*.ts\" \"scripts/**/*.ts\" && prettier --check \"test/**/*.ts\" \"scripts/**/*.ts\"",
     "deploy-filesystem": "npx hardhat ignition deploy ignition/modules/deploy-filesystem.ts --network $NETWORK --strategy create2",
     "deploy-social-connection": "npx hardhat ignition deploy ignition/modules/deploy-social-connections.ts --network $NETWORK --strategy create2",
-    "deploy-user-verification": "npx hardhat ignition deploy ignition/modules/deploy-user-verification.ts --network $NETWORK --strategy create2",
+    "deploy-user-verification": "npx hardhat ignition deploy ignition/modules/deploy-user-verification.ts --network $NETWORK",
     "deploy-all": "npm run deploy-filesystem && npm run deploy-social-connection && npm run deploy-user-verification",
     "deploy-all-localhost": "NETWORK=localhost npm run deploy-all",
     "deploy-all-testnet-op": "NETWORK=testnet npm run deploy-all",
