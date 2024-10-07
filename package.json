@@ -12,6 +12,12 @@
     "deploy-all": "npm run deploy-filesystem && npm run deploy-social-connection && npm run deploy-user-verification",
     "deploy-all-localhost": "NETWORK=localhost npm run deploy-all",
     "deploy-all-testnet-op": "NETWORK=testnet npm run deploy-all",
+    "deploy-create2-testnet-base": "export DEPLOYER_GATEWAY_URL_MAINNET=https://sepolia.base.org NETWORK=mainnet && npm run deploy-filesystem && npm run deploy-social-connection",
+    "deploy-create2-mainnet-base": "export DEPLOYER_GATEWAY_URL_MAINNET=https://mainnet.base.org NETWORK=mainnet && npm run deploy-filesystem && npm run deploy-social-connection",
+    "deploy-create2-testnet-cyber": "export DEPLOYER_GATEWAY_URL_MAINNET=https://rpc.testnet.cyber.co NETWORK=mainnet && npm run deploy-filesystem && npm run deploy-social-connection",
+    "deploy-create2-mainnet-cyber": "export DEPLOYER_GATEWAY_URL_MAINNET=https://rpc.cyber.co NETWORK=mainnet && npm run deploy-filesystem && npm run deploy-social-connection",
+    "deploy-create2-testnet-mode": "export DEPLOYER_GATEWAY_URL_MAINNET=https://sepolia.mode.network NETWORK=mainnet && npm run deploy-filesystem && npm run deploy-social-connection",
+    "deploy-create2-mainnet-mode": "export DEPLOYER_GATEWAY_URL_MAINNET=https://mainnet.mode.network NETWORK=mainnet && npm run deploy-filesystem && npm run deploy-social-connection",
     "deploy-all-testnet-base": "DEPLOYER_GATEWAY_URL=https://sepolia.base.org NETWORK=testnet npm run deploy-all",
     "deploy-all-mainnet": "NETWORK=mainnet npm run deploy-all",
     "set-managers-op-mainnet": "npx hardhat run --network mainnet scripts/set-managers.ts"

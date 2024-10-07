@@ -97,3 +97,7 @@ npm ci
 # test the contracts
 npx hardhat test
 ```
+
+## Other
+
+[Superchain Chains](https://www.superchain.eco/chains)
