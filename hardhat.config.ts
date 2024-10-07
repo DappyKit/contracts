@@ -60,6 +60,13 @@ const config: HardhatUserConfig = {
   sourcify: {
     enabled: true,
   },
+  ignition: {
+    strategyConfig: {
+      create2: {
+        salt: '0x0000000000000000000000000000000000000000000000000000000000000000',
+      },
+    },
+  },
 }
 
 export default config

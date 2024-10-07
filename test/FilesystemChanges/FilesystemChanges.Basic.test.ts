@@ -9,21 +9,9 @@ describe('FilesystemChanges', () => {
 
     const FilesystemChanges = await ethers.getContractFactory('FilesystemChanges')
     const filesystemChanges = await FilesystemChanges.deploy()
-    await filesystemChanges.initialize(owner.address)
 
     return { filesystemChanges, owner, otherAccount }
   }
-
-  describe('initialize', () => {
-    it('should not initialize more than once', async () => {
-      const [owner] = await ethers.getSigners()
-      const { filesystemChanges } = await loadFixture(deployFilesystemChangesFixture)
-
-      await expect(filesystemChanges.initialize(owner.address)).to.eventually.be.rejectedWith(
-        "VM Exception while processing transaction: reverted with custom error 'InvalidInitialization()",
-      )
-    })
-  })
 
   describe('setServiceChange', () => {
     it('should set a Multihash for the service account', async () => {

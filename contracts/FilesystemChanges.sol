@@ -1,15 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-
 /**
  * @title FilesystemChanges
  * @dev Store and manage filesystem changes (in form of Multihash) for users and services.
  */
-contract FilesystemChanges is Initializable, OwnableUpgradeable, UUPSUpgradeable {
+contract FilesystemChanges {
     struct Multihash {
         bytes32 hash;
         uint8 hashFunction;
@@ -21,20 +17,6 @@ contract FilesystemChanges is Initializable, OwnableUpgradeable, UUPSUpgradeable
 
     // Mapping for user smart accounts' filesystem changes
     mapping(address => Multihash) public userChanges;
-
-    /**
-     * @dev Initialize the contract. This serves as a constructor for upgradeable contracts.
-     */
-    function initialize(address initialOwner) public initializer {
-        __Ownable_init(initialOwner);
-        __UUPSUpgradeable_init();
-    }
-
-    function _authorizeUpgrade(address newImplementation)
-    internal
-    onlyOwner
-    override
-    {}
 
     /**
      * @dev Set a Multihash for the service smart account of the sender.
