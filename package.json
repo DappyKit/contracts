@@ -12,6 +12,7 @@
     "deploy-all": "npm run deploy-filesystem && npm run deploy-social-connection && npm run deploy-user-verification",
     "deploy-all-localhost": "NETWORK=localhost npm run deploy-all",
     "deploy-all-testnet-op": "NETWORK=testnet npm run deploy-all",
+    "deploy-create2-testnet-op": "export DEPLOYER_GATEWAY_URL_MAINNET=https://sepolia.optimism.io NETWORK=mainnet && npm run deploy-filesystem && npm run deploy-social-connection",
     "deploy-create2-testnet-base": "export DEPLOYER_GATEWAY_URL_MAINNET=https://sepolia.base.org NETWORK=mainnet && npm run deploy-filesystem && npm run deploy-social-connection",
     "deploy-create2-mainnet-base": "export DEPLOYER_GATEWAY_URL_MAINNET=https://mainnet.base.org NETWORK=mainnet && npm run deploy-filesystem && npm run deploy-social-connection",
     "deploy-create2-testnet-cyber": "export DEPLOYER_GATEWAY_URL_MAINNET=https://rpc.testnet.cyber.co NETWORK=mainnet && npm run deploy-filesystem && npm run deploy-social-connection",
