@@ -18,7 +18,9 @@ describe('FilesystemChanges', () => {
       const { filesystemChanges, owner } = await loadFixture(deployFilesystemChangesFixture)
 
       const multihash = getMultiHash('hello')
-      await filesystemChanges.connect(owner).setServiceChange(multihash)
+      await expect(filesystemChanges.connect(owner).setServiceChange(multihash))
+        .to.emit(filesystemChanges, 'ServiceConnectionSet')
+        .withArgs(owner.address, ...Object.values(multihash))
       expect(await filesystemChanges.serviceChanges(owner.address)).to.deep.equal(Object.values(multihash))
     })
   })
@@ -28,7 +30,9 @@ describe('FilesystemChanges', () => {
       const { filesystemChanges, owner } = await loadFixture(deployFilesystemChangesFixture)
 
       const multihash = getMultiHash('hello')
-      await filesystemChanges.connect(owner).setUserChange(multihash)
+      await expect(filesystemChanges.connect(owner).setUserChange(multihash))
+        .to.emit(filesystemChanges, 'UserConnectionSet')
+        .withArgs(owner.address, ...Object.values(multihash))
       expect(await filesystemChanges.userChanges(owner.address)).to.deep.equal(Object.values(multihash))
     })
 
@@ -36,10 +40,14 @@ describe('FilesystemChanges', () => {
       const { filesystemChanges, owner } = await loadFixture(deployFilesystemChangesFixture)
 
       const initialMultihash = getMultiHash('initial')
-      await filesystemChanges.connect(owner).setUserChange(initialMultihash)
+      await expect(filesystemChanges.connect(owner).setUserChange(initialMultihash))
+        .to.emit(filesystemChanges, 'UserConnectionSet')
+        .withArgs(owner.address, ...Object.values(initialMultihash))
 
       const newMultihash = getMultiHash('new')
-      await filesystemChanges.connect(owner).setUserChange(newMultihash)
+      await expect(filesystemChanges.connect(owner).setUserChange(newMultihash))
+        .to.emit(filesystemChanges, 'UserConnectionSet')
+        .withArgs(owner.address, ...Object.values(newMultihash))
 
       expect(await filesystemChanges.userChanges(owner.address)).to.deep.equal(Object.values(newMultihash))
     })
@@ -64,7 +72,9 @@ describe('FilesystemChanges', () => {
       const multihash = getMultiHash('hello')
 
       await filesystemChanges.connect(owner).setUserChange(multihash)
-      await filesystemChanges.connect(owner).removeChange(false)
+      await expect(filesystemChanges.connect(owner).removeChange(false))
+        .to.emit(filesystemChanges, 'ConnectionRemoved')
+        .withArgs(owner.address, false)
 
       expect(await filesystemChanges.userChanges(owner.address)).to.deep.equal([ethers.ZeroHash, 0, 0])
     })

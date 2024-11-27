@@ -31,6 +31,16 @@ The following contracts are available in the repository:
 
 [Old contracts](/docs/OLD_CONTRACTS.md).
 
+## Testing smart contracts
+
+```shell
+# install dependencies
+npm ci
+
+# test the contracts
+npx hardhat test
+```
+
 ## Deploy contracts
 
 ### With Create2 (preferable)
@@ -86,16 +96,6 @@ npm run deploy-op-mainnet
 npx hardhat verify --network mainnet DEPLOYED_CONTRACT_ADDRESS
 
 # the deployed addresses will be saved in `./deployed-contracts.json`
-```
-
-## Testing smart contracts
-
-```shell
-# install dependencies
-npm ci
-
-# test the contracts
-npx hardhat test
 ```
 
 ## Other
