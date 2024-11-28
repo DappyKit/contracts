@@ -18,7 +18,9 @@ describe('SocialConnections', () => {
       const { socialConnections, owner } = await loadFixture(deploySocialConnectionsFixture)
 
       const multihash = getMultiHash('hello')
-      await socialConnections.connect(owner).setServiceConnection(multihash)
+      await expect(socialConnections.connect(owner).setServiceConnection(multihash))
+        .to.emit(socialConnections, 'ServiceConnectionSet')
+        .withArgs(owner.address, ...Object.values(multihash))
       expect(await socialConnections.serviceConnections(owner.address)).to.deep.equal(Object.values(multihash))
     })
   })
@@ -28,7 +30,9 @@ describe('SocialConnections', () => {
       const { socialConnections, owner } = await loadFixture(deploySocialConnectionsFixture)
 
       const multihash = getMultiHash('hello')
-      await socialConnections.connect(owner).setUserConnection(multihash)
+      expect(await socialConnections.connect(owner).setUserConnection(multihash))
+        .to.emit(socialConnections, 'UserConnectionSet')
+        .withArgs(owner.address, ...Object.values(multihash))
       expect(await socialConnections.userConnections(owner.address)).to.deep.equal(Object.values(multihash))
     })
 
@@ -66,7 +70,9 @@ describe('SocialConnections', () => {
       const multihash = getMultiHash('hello')
 
       await socialConnections.connect(owner).setUserConnection(multihash)
-      await socialConnections.connect(owner).deleteConnection(false)
+      await expect(socialConnections.connect(owner).removeConnection(false))
+        .to.emit(socialConnections, 'ConnectionRemoved')
+        .withArgs(owner.address, false)
 
       expect(await socialConnections.userConnections(owner.address)).to.deep.equal([ethers.ZeroHash, 0, 0])
     })

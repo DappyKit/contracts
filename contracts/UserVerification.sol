@@ -14,6 +14,21 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
  * revocation, and reissuance of tokens, as well as checking their validity and expiration status.
  */
 contract UserVerification is Initializable, ERC721Upgradeable, ERC721BurnableUpgradeable, OwnableUpgradeable, UUPSUpgradeable {
+    /// @notice Emitted when a manager is set or unset
+    event ManagerSet(address manager, bool flag);
+
+    /// @notice Emitted when the default expiry duration is changed
+    event DefaultExpiryDurationChanged(uint256 newDuration);
+
+    /// @notice Emitted when a token is issued
+    event TokenIssued(address user, uint256 tokenId);
+
+    /// @notice Emitted when a token is revoked
+    event TokenRevoked(address user, uint256 tokenId);
+
+    /// @notice Emitted when a token's expiry is extended
+    event TokenExpiryExtended(address user, uint256 tokenId);
+
     /// @notice Indicates if an address is a manager
     mapping(address => bool) public isManager;
 
@@ -32,12 +47,6 @@ contract UserVerification is Initializable, ERC721Upgradeable, ERC721BurnableUpg
         require(isManager[_msgSender()], "Only managers can call this function");
         _;
     }
-
-    /// @notice Emitted when a manager is set or unset
-    event ManagerSet(address manager, bool flag);
-
-    /// @notice Emitted when the default expiry duration is changed
-    event DefaultExpiryDurationChanged(uint256 newDuration);
 
     /**
      * @dev Initializes the contract with the given name, symbol, and default expiry duration.
@@ -115,6 +124,7 @@ contract UserVerification is Initializable, ERC721Upgradeable, ERC721BurnableUpg
         _safeMint(user, tokenId);
         _userTokens[user] = tokenId;
         _setTokenExpiry(tokenId, block.timestamp + defaultExpiryDuration);
+        emit TokenIssued(user, tokenId);
     }
 
     /**
@@ -128,6 +138,7 @@ contract UserVerification is Initializable, ERC721Upgradeable, ERC721BurnableUpg
         _burn(tokenId);
         delete _userTokens[tokenOwner];
         delete _tokenExpiryTimes[tokenId];
+        emit TokenRevoked(tokenOwner, tokenId);
     }
 
     /**
@@ -138,6 +149,7 @@ contract UserVerification is Initializable, ERC721Upgradeable, ERC721BurnableUpg
     function extendTokenExpiry(uint256 tokenId) external onlyManagers {
         require(_ownerOf(tokenId) != address(0), "Token does not exist");
         _setTokenExpiry(tokenId, block.timestamp + defaultExpiryDuration);
+        emit TokenExpiryExtended(_ownerOf(tokenId), tokenId);
     }
 
     /**

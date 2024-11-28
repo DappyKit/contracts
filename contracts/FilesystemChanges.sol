@@ -6,6 +6,15 @@ pragma solidity ^0.8.20;
  * @dev Store and manage filesystem changes (in form of Multihash) for users and services.
  */
 contract FilesystemChanges {
+    // Event for setting a service connection
+    event ServiceConnectionSet(address indexed serviceAddress, bytes32 hash, uint8 hashFunction, uint8 size);
+
+    // Event for setting a user connection
+    event UserConnectionSet(address indexed userAddress, bytes32 hash, uint8 hashFunction, uint8 size);
+
+    // Event for removing a connection
+    event ConnectionRemoved(address indexed accountAddress, bool isService);
+
     struct Multihash {
         bytes32 hash;
         uint8 hashFunction;
@@ -24,6 +33,7 @@ contract FilesystemChanges {
      */
     function setServiceChange(Multihash memory multihash) public {
         serviceChanges[msg.sender] = multihash;
+        emit ServiceConnectionSet(msg.sender, multihash.hash, multihash.hashFunction, multihash.size);
     }
 
     /**
@@ -32,6 +42,7 @@ contract FilesystemChanges {
      */
     function setUserChange(Multihash memory multihash) public {
         userChanges[msg.sender] = multihash;
+        emit UserConnectionSet(msg.sender, multihash.hash, multihash.hashFunction, multihash.size);
     }
 
     /**
@@ -44,5 +55,7 @@ contract FilesystemChanges {
         } else {
             delete userChanges[msg.sender];
         }
+
+        emit ConnectionRemoved(msg.sender, isService);
     }
 }

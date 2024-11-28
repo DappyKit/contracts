@@ -19,8 +19,8 @@ The following contracts are available in the repository:
 ### Superchain (CREATE2) Addresses
 | Contract                         | Superchain Address                                                                                                     |
 |----------------------------------|------------------------------------------------------------------------------------------------------------------------|
-| SocialConnections.sol            | [0xB7C1C10A71d3C90f42351bec7E4BCd647C992743](https://blockscan.com/address/0xB7C1C10A71d3C90f42351bec7E4BCd647C992743)                                                                                 |
-| FilesystemChanges.sol            | [0x55043C8f3e8Ec55D2d60Acef83024F3b6da5AAf0](https://blockscan.com/address/0x55043C8f3e8Ec55D2d60Acef83024F3b6da5AAf0) |
+| SocialConnections.sol            | [0x99583220489a0e4217911ECf50680918F6a8B958](https://blockscan.com/address/0x99583220489a0e4217911ECf50680918F6a8B958)                                                                                 |
+| FilesystemChanges.sol            | [0x30C974bE6581e3a00595d0b7C1ba7A8A91413e1f](https://blockscan.com/address/0x30C974bE6581e3a00595d0b7C1ba7A8A91413e1f) |
 
 ### Addresses
 | Contract                         | Address                      |
@@ -31,12 +31,23 @@ The following contracts are available in the repository:
 
 [Old contracts](/docs/OLD_CONTRACTS.md).
 
+## Testing smart contracts
+
+```shell
+# install dependencies
+npm ci
+
+# test the contracts
+npx hardhat test
+```
+
 ## Deploy contracts
 
 ### With Create2 (preferable)
 
 ```shell
 # localhost
+npx hardhat node # start a local node
 npm run deploy-all-localhost
 
 # OP Sepolia
@@ -86,16 +97,6 @@ npm run deploy-op-mainnet
 npx hardhat verify --network mainnet DEPLOYED_CONTRACT_ADDRESS
 
 # the deployed addresses will be saved in `./deployed-contracts.json`
-```
-
-## Testing smart contracts
-
-```shell
-# install dependencies
-npm ci
-
-# test the contracts
-npx hardhat test
 ```
 
 ## Other

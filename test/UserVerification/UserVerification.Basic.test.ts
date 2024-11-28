@@ -31,7 +31,9 @@ describe('UserVerification', () => {
       const { userVerification, owner, tokenId } = await loadFixture(deployUserVerificationFixture)
 
       expect(await userVerification.balanceOf(owner.address)).to.equal(0)
-      await userVerification.issueToken(owner.address, tokenId)
+      await expect(userVerification.issueToken(owner.address, tokenId))
+        .to.emit(userVerification, 'TokenIssued')
+        .withArgs(owner.address, tokenId)
       expect(await userVerification.balanceOf(owner.address)).to.equal(1)
     })
 
@@ -52,7 +54,9 @@ describe('UserVerification', () => {
       await userVerification.issueToken(owner.address, tokenId)
       expect(await userVerification.ownerOf(tokenId)).to.equal(owner.address)
       expect(await userVerification.getTokenId(owner.address)).to.equal(tokenId)
-      await userVerification.revokeToken(tokenId)
+      await expect(userVerification.revokeToken(tokenId))
+        .to.emit(userVerification, 'TokenRevoked')
+        .withArgs(owner.address, tokenId)
       expect(await userVerification.balanceOf(owner.address)).to.equal(0)
     })
 
@@ -75,7 +79,9 @@ describe('UserVerification', () => {
       await ethers.provider.send('evm_mine')
       expect(await userVerification.isTokenExpired(tokenId)).to.equal(true)
 
-      await userVerification.extendTokenExpiry(tokenId)
+      await expect(userVerification.extendTokenExpiry(tokenId))
+        .to.emit(userVerification, 'TokenExpiryExtended')
+        .withArgs(owner.address, tokenId)
       expect(await userVerification.isTokenExpired(tokenId)).to.equal(false)
     })
   })
@@ -262,7 +268,9 @@ describe('UserVerification', () => {
           account3: manager,
           tokenId,
         } = await loadFixture(deployUserVerificationFixture)
-        await userVerification.setManagers([manager.address], true)
+        await expect(userVerification.setManagers([manager.address], true))
+          .to.emit(userVerification, 'ManagerSet')
+          .withArgs(manager.address, true)
         await expect(userVerification.connect(manager).issueToken(otherAccount.address, tokenId))
           .to.emit(userVerification, 'Transfer')
           .withArgs(ethers.ZeroAddress, otherAccount.address, tokenId)
